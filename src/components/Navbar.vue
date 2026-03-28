@@ -28,6 +28,7 @@ const pageTitle = computed(() => {
     case '/kelola-relawan': return 'Data Relawan';
     case '/jadwal-kerja': return 'Jadwal Kerja';
     case '/rekap-absensi': return 'Rekap Absensi';
+    case '/riwayat-absensi': return 'Riwayat Absensi';
     case '/data-gudang': return ' Management Gudang';
     case '/laporan-stok': return 'Laporan Stok'
     case '/pengaturan': return 'Pengaturan Sistem';

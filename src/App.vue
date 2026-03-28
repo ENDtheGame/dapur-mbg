@@ -1,16 +1,21 @@
 <template>
   <router-view />
-     <AsistenAI />
+  <AsistenAI v-if="tampilkanAsisten" />
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { supabase } from './lib/supabaseClient';
-import AsistenAI from './components/AsistenAI.vue'; // Pastikan path file-nya benar
+import { computed, ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { supabase } from "./lib/supabaseClient";
+import AsistenAI from "./components/AsistenAI.vue"; // Pastikan path file-nya benar
 
 const router = useRouter();
 const hasSession = ref(false);
+
+const tampilkanAsisten = computed(() => {
+  // Cek apakah route sudah ada, lalu cek nama atau meta-nya
+  return router.name && router.name !== "login" && !router.meta?.hideAssistant;
+});
 
 onMounted(async () => {
   // Cek session awal saat aplikasi dimuat
@@ -20,9 +25,9 @@ onMounted(async () => {
   // Pantau perubahan status login
   supabase.auth.onAuthStateChange((event, session) => {
     hasSession.value = !!session;
-    
-    if (event === 'SIGNED_OUT') {
-      router.push('/login');
+
+    if (event === "SIGNED_OUT") {
+      router.push("/login");
     }
   });
 });
