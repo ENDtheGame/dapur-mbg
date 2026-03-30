@@ -26,12 +26,15 @@ const pageTitle = computed(() => {
   switch (route.path) {
     case '/dashboard': return 'Dashboard';
     case '/kelola-relawan': return 'Data Relawan';
+    case '/tambah-relawan': return 'Tambah Relawan';
     case '/jadwal-kerja': return 'Jadwal Kerja';
     case '/rekap-absensi': return 'Rekap Absensi';
     case '/riwayat-absensi': return 'Riwayat Absensi';
     case '/data-gudang': return ' Management Gudang';
-    case '/laporan-stok': return 'Laporan Stok'
-    case '/pengaturan': return 'Pengaturan Sistem';
+    case '/laporan-stok': return 'Laporan Stok';
+    case '/resep': return 'Kalkulator porsi';
+    case '/distribusi-porsi': return 'Distribusi porsi';
+  
     default: return 'SPPG CIGEDUG 2';
   }
 });

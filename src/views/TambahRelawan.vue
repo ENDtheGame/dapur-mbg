@@ -1,7 +1,5 @@
 <template>
   <div class="p-6 max-w-2xl mx-auto">
-    <h1 class="text-2xl font-bold mb-6 text-slate-800">Tambah Relawan Baru</h1>
-
     <div
       class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4"
     >

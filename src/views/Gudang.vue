@@ -22,9 +22,16 @@
           </button>
         </div>
 
-        <button @click="bukaModalTambah" class="bg-amber-500 text-white p-4 rounded-2xl shadow-lg shadow-amber-200 hover:scale-105 active:scale-95 transition">
-          <PlusIcon :size="20" />
-        </button>
+        <!-- Ganti tombol kategori di header jadi ini -->
+<button @click="bukaManageKategori" class="p-4 bg-amber-100 text-amber-600 rounded-2xl hover:bg-amber-500 hover:text-white transition shadow-sm">
+  <FolderIcon :size="20" />
+</button>
+
+<button @click="bukaModalTambah" class="p-4 bg-slate-800 text-white rounded-2xl hover:bg-slate-700 shadow-lg shadow-slate-200 transition flex items-center gap-2">
+  <PlusIcon :size="20" />
+  <span class="hidden md:block font-bold text-sm">Barang Baru</span>
+</button>
+
       </div>
     </div>
 
@@ -96,9 +103,19 @@
       <PackageIcon :size="24" />
     </div>
     <div>
-      <h3 class="font-bold" :class="isStokKritis(item) ? 'text-rose-700' : 'text-slate-800'">
-        {{ item.nama_bahan }}
-      </h3>
+<!-- Cari bagian h3 nama_bahan, tambahkan span di bawahnya -->
+<h3 class="font-bold" :class="isStokKritis(item) ? 'text-rose-700' : 'text-slate-800'">
+  {{ item.nama_bahan }}
+</h3>
+
+<!-- Tambahkan Badge Tipe Ini -->
+<div class="flex gap-1 mt-1">
+  <span class="text-[7px] px-1.5 py-0.5 rounded font-black uppercase tracking-tighter"
+        :class="item.kategori?.tipe === 'ASET' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'">
+    {{ item.kategori?.tipe === 'ASET' ? 'ASET' : 'KONSUMSI' }}
+  </span>
+</div>
+
       <p v-if="isStokKritis(item)" class="text-[9px] text-rose-500 font-black uppercase tracking-widest animate-pulse">
         ⚠️ Stok Menipis!
       </p>
@@ -119,10 +136,14 @@
     </div>
     
     <div class="flex gap-1 border-l pl-4 ml-2 border-slate-100">
-      <button @click="bukaModalTransaksi(item, 'MASUK')" class="p-3 bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-500 hover:text-white transition"><PlusIcon :size="18" /></button>
-      <button @click="bukaModalTransaksi(item, 'KELUAR')" class="p-3 bg-rose-50 text-rose-600 rounded-2xl hover:bg-rose-500 hover:text-white transition"><MinusIcon :size="18" /></button>
-      <button @click="bukaModalEdit(item)" class="p-3 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-500 hover:text-white transition"><EditIcon :size="18" /></button>
-    </div>
+  <button @click="bukaModalTransaksi(item, 'MASUK')" class="p-3 bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-500 hover:text-white transition"><PlusIcon :size="18" /></button>
+  <button @click="bukaModalTransaksi(item, 'KELUAR')" class="p-3 bg-rose-50 text-rose-600 rounded-2xl hover:bg-rose-500 hover:text-white transition"><MinusIcon :size="18" /></button>
+  <button @click="bukaModalEdit(item)" class="p-3 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-500 hover:text-white transition"><EditIcon :size="18" /></button>
+  
+  <!-- TOMBOL HAPUS BARANG -->
+  <button @click="konfirmasiHapus(item)" class="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-rose-500 hover:text-white transition"><Trash2Icon :size="18" /></button>
+</div>
+
   </div>
 </div>
 
@@ -140,6 +161,10 @@
               <option :value="selectedBahan?.satuan_kecil_id">{{ selectedBahan?.satuan_kecil?.nama_satuan }}</option>
             </select>
           </div>
+            <textarea v-model="formTrans.keterangan" 
+            placeholder="Keterangan (Contoh: Rusak, Hilang, atau Dipakai Masak)"
+            class="w-full p-4 bg-slate-100 rounded-2xl font-bold text-xs outline-none focus:ring-2 ring-amber-500"
+            rows="2"></textarea>
           <div class="flex gap-3">
             <button @click="showModalTrans = false" class="flex-1 py-4 font-bold text-slate-400">Batal</button>
             <button @click="simpanTransaksi" class="flex-[2] py-4 bg-slate-800 text-white rounded-2xl font-bold">Simpan</button>
@@ -221,6 +246,93 @@
   </div>
 </div>
 
+<!-- MODAL TAMBAH KATEGORI (CUSTOM UI) -->
+<div v-if="showModalKategori" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-6">
+  <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+    <div class="w-16 h-16 bg-amber-50 text-amber-500 rounded-3xl flex items-center justify-center mb-6 mx-auto">
+      <FolderIcon :size="32" />
+    </div>
+    
+    <h2 class="text-xl font-black mb-2 text-center text-slate-800">Kategori Baru</h2>
+    <p class="text-[10px] text-slate-400 text-center mb-8 font-bold uppercase tracking-widest">Kelompokkan Barang Kamu</p>
+    
+    <div class="space-y-4">
+      <div>
+        <label class="text-[10px] font-black text-slate-400 ml-2 uppercase block mb-1">Nama Kategori</label>
+        <input v-model="formKategoriBaru.nama_kategori" 
+               class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none focus:ring-2 ring-amber-500" 
+               placeholder="Misal: Frozen Food">
+      </div>
+
+      <div>
+        <label class="text-[10px] font-black text-slate-400 ml-2 uppercase block mb-1">Tipe Kategori</label>
+        <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl">
+          <button @click="formKategoriBaru.tipe = 'KONSUMSI'"
+                  :class="formKategoriBaru.tipe === 'KONSUMSI' ? 'bg-white shadow-sm text-sky-600' : 'text-slate-400'"
+                  class="py-3 text-[10px] font-black uppercase rounded-xl transition-all">
+            Bahan Dapur
+          </button>
+          <button @click="formKategoriBaru.tipe = 'ASET'"
+                  :class="formKategoriBaru.tipe === 'ASET' ? 'bg-white shadow-sm text-amber-600' : 'text-slate-400'"
+                  class="py-3 text-[10px] font-black uppercase rounded-xl transition-all">
+            Aset/Alat
+          </button>
+        </div>
+        <p class="text-[9px] text-slate-400 mt-2 px-2 italic text-center leading-relaxed">
+          *Aset tidak akan habis saat dipakai, hanya berkurang jika rusak/hilang.
+        </p>
+      </div>
+
+      <div class="pt-4 flex gap-2">
+        <button @click="showModalKategori = false" class="flex-1 py-4 font-bold text-slate-400 text-sm">Batal</button>
+        <button @click="simpanKategoriBaru" :disabled="loadingProses" 
+                class="flex-[2] py-4 bg-slate-800 text-white rounded-2xl font-black shadow-lg hover:bg-slate-700 transition disabled:opacity-50">
+          {{ loadingProses ? '...' : 'SIMPAN' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MANAGE KATEGORI -->
+<div v-if="showModalManageKategori" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
+  <div class="bg-white w-full max-w-md rounded-[2.5rem] p-6 shadow-2xl flex flex-col max-h-[80vh]">
+    <div class="flex justify-between items-center mb-6 px-2">
+      <h2 class="text-lg font-black text-slate-800 uppercase tracking-tight">Kelola Kategori</h2>
+      <button @click="showModalManageKategori = false" class="p-2 text-slate-400 hover:text-rose-500">
+        <XIcon :size="24" />
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+      <div v-for="kat in daftarKategoriDB" :key="kat.id" 
+           class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+        <div>
+          <p class="font-bold text-slate-700 text-sm">{{ kat.nama_kategori }}</p>
+          <span class="text-[8px] font-black px-1.5 py-0.5 rounded uppercase"
+                :class="kat.tipe === 'ASET' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'">
+            {{ kat.tipe }}
+          </span>
+        </div>
+        <div class="flex gap-1">
+          <button @click="updateKategori(kat)" class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100">
+            <EditIcon :size="16" />
+          </button>
+          <button @click="hapusKategori(kat.id, kat.nama_kategori)" class="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-100">
+            <Trash2Icon :size="16" />
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <button @click="bukaModalKategori" class="mt-6 w-full py-4 bg-slate-800 text-white rounded-2xl font-black text-xs tracking-widest uppercase">
+      + Tambah Kategori Baru
+    </button>
+  </div>
+</div>
+
+
+
   </div>
 </template>
 
@@ -259,6 +371,13 @@ const formBahanBaru = ref({
   total_stok_kecil: 0
 });
 
+const showModalKategori = ref(false);
+const formKategoriBaru = ref({ nama_kategori: '', tipe: 'KONSUMSI' });
+const showModalManageKategori = ref(false);
+const kategoriSedangEdit = ref(null); // Untuk menampung id kategori yang mau diubah
+
+
+
 // Tambahkan di bagian FUNCTIONS di script setup
 const isStokKritis = (item) => {
   const stok = parseFloat(item.total_stok_kecil || 0);
@@ -296,38 +415,99 @@ const getIconKategori = (nama) => {
   return FolderIcon;
 };
 
-const tambahKategoriBaru = async () => {
-  const { value: namaKategori } = await Swal.fire({
-    title: 'Kategori Baru',
-    input: 'text',
-    inputLabel: 'Masukkan nama kategori baru',
-    inputPlaceholder: 'Contoh: Frozen Food, Plastik, dll',
+const bukaManageKategori = async () => {
+  const { data } = await supabase.from('kategori_bahan').select('*').order('nama_kategori');
+  daftarKategoriDB.value = data || [];
+  showModalManageKategori.value = true;
+};
+
+const updateKategori = async (kat) => {
+  const { value: formValues } = await Swal.fire({
+    title: 'Edit Kategori',
+    html:
+      `<input id="edit-kat-nama" class="swal2-input" value="${kat.nama_kategori}">` +
+      `<select id="edit-kat-tipe" class="swal2-input">
+        <option value="KONSUMSI" ${kat.tipe === 'KONSUMSI' ? 'selected' : ''}>Bahan Dapur</option>
+        <option value="ASET" ${kat.tipe === 'ASET' ? 'selected' : ''}>Aset / Alat</option>
+      </select>`,
     showCancelButton: true,
-    confirmButtonColor: '#f59e0b',
+    confirmButtonText: 'Simpan',
+    preConfirm: () => [
+      document.getElementById('edit-kat-nama').value,
+      document.getElementById('edit-kat-tipe').value
+    ]
   });
 
-  if (namaKategori) {
-    try {
-      const { data, error } = await supabase
-        .from('kategori_bahan')
-        .insert([{ nama_kategori: namaKategori }])
-        .select();
+  if (formValues) {
+    const { error } = await supabase
+      .from('kategori_bahan')
+      .update({ nama_kategori: formValues[0], tipe: formValues[1] })
+      .eq('id', kat.id);
 
-      if (error) throw error;
-
-      // Refresh daftar kategori di dropdown
-      const { data: dataKat } = await supabase.from('kategori_bahan').select('*').order('nama_kategori');
-      daftarKategoriDB.value = dataKat || [];
-      
-      // Otomatis pilih kategori yang baru dibuat
-      formBahanBaru.value.kategori_id = data[0].id;
-      
-      Swal.fire('Berhasil', `Kategori ${namaKategori} telah ditambahkan`, 'success');
-    } catch (err) {
-      Swal.fire('Gagal', err.message, 'error');
+    if (!error) {
+      Swal.fire('Berhasil', 'Kategori diperbarui', 'success');
+      bukaManageKategori(); // Refresh list
+      fetchGudang(); // Refresh halaman utama
     }
   }
 };
+
+const hapusKategori = async (id, nama) => {
+  const { isConfirmed } = await Swal.fire({
+    title: 'Hapus Kategori?',
+    text: `Kategori "${nama}" akan dihapus. Barang di dalamnya mungkin akan kehilangan kategori.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#ef4444',
+    confirmButtonText: 'Ya, Hapus'
+  });
+
+  if (isConfirmed) {
+    const { error } = await supabase.from('kategori_bahan').delete().eq('id', id);
+    if (!error) {
+      Swal.fire('Terhapus', '', 'success');
+      bukaManageKategori();
+      fetchGudang();
+    } else {
+      Swal.fire('Gagal', 'Kategori masih digunakan oleh barang!', 'error');
+    }
+  }
+};
+
+
+const bukaModalKategori = () => {
+  formKategoriBaru.value = { nama_kategori: '', tipe: 'KONSUMSI' };
+  showModalKategori.value = true;
+};
+
+const simpanKategoriBaru = async () => {
+  if (!formKategoriBaru.value.nama_kategori) return;
+  
+  loadingProses.value = true;
+  try {
+    const { data, error } = await supabase
+      .from('kategori_bahan')
+      .insert([formKategoriBaru.value])
+      .select();
+
+    if (error) throw error;
+
+    // Refresh daftar kategori untuk dropdown
+    const { data: dataKat } = await supabase.from('kategori_bahan').select('*').order('nama_kategori');
+    daftarKategoriDB.value = dataKat || [];
+    
+    // Otomatis pilih kategori yang baru dibuat di form barang
+    formBahanBaru.value.kategori_id = data[0].id;
+    
+    showModalKategori.value = false;
+    Swal.fire({ icon: 'success', title: 'Kategori Ditambahkan', timer: 1000, showConfirmButton: false });
+  } catch (err) {
+    Swal.fire('Gagal', err.message, 'error');
+  } finally {
+    loadingProses.value = false;
+  }
+};
+
 
 
 const fetchGudang = async () => {
@@ -338,7 +518,7 @@ const fetchGudang = async () => {
       .select(`*, 
         satuan_besar:satuan!satuan_besar_id(nama_satuan), 
         satuan_kecil:satuan!satuan_kecil_id(nama_satuan),
-        kategori:kategori_bahan(nama_kategori)
+        kategori:kategori_bahan(nama_kategori, tipe)
       `)
       .order('nama_bahan');
     
@@ -416,13 +596,18 @@ const simpanTransaksi = async () => {
 
     if (errUpdate) throw errUpdate;
 
-    await supabase.from('riwayat_gudang').insert([{
-      bahan_id: selectedBahan.value.id,
-      tipe_transaksi: tipeTrans.value,
-      jumlah_input: formTrans.value.jumlah,
-      satuan_id: formTrans.value.satuan_id,
-      total_dalam_kecil: jumlahKecil
-    }]);
+    // Di dalam fungsi simpanTransaksi, bagian insert riwayat_gudang
+await supabase.from('riwayat_gudang').insert([{
+  bahan_id: selectedBahan.value.id,
+  tipe_transaksi: tipeTrans.value,
+  jumlah_input: formTrans.value.jumlah,
+  satuan_id: formTrans.value.satuan_id,
+  total_dalam_kecil: jumlahKecil,
+  keterangan: formTrans.value.keterangan // Tambahkan baris ini
+}]);
+
+// Jangan lupa reset keterangan setelah simpan
+formTrans.value.keterangan = '';
 
     showModalTrans.value = false;
     await fetchGudang();
@@ -435,6 +620,8 @@ const simpanTransaksi = async () => {
 };
 
 const bukaModalTambah = async () => {
+  isEditing.value = false; // Pastikan ini false agar judulnya "Barang Baru"
+  
   const { data: dataSatuan } = await supabase.from('satuan').select('*').order('nama_satuan');
   daftarSatuan.value = dataSatuan || [];
   
@@ -443,12 +630,18 @@ const bukaModalTambah = async () => {
   
   // Reset Form
   formBahanBaru.value = {
-    nama_bahan: '', kategori_id: null, satuan_besar_id: null, 
-    satuan_kecil_id: null, isi_per_satuan_besar: 1, stok_minimum_kecil: 0, total_stok_kecil: 0
+    nama_bahan: '', 
+    kategori_id: null, 
+    satuan_besar_id: null, 
+    satuan_kecil_id: null, 
+    isi_per_satuan_besar: 1, 
+    stok_minimum_kecil: 0, 
+    total_stok_kecil: 0
   };
   
   showModalTambah.value = true;
 };
+
 
 const bukaModalEdit = async (item) => {
   isEditing.value = true;

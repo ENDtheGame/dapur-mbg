@@ -11,6 +11,8 @@ import RekapAbsensi from "../views/RekapAbsensi.vue";
 import LogPresensi from "../views/LogPresensi.vue";
 import LaporanStok from "../views/LaporanOpname.vue";
 import Gudang from "../views/Gudang.vue";
+import Resep from "../views/Resep.vue";
+import DistribusiPorsi from "../views/DistribusiPorsi.vue"
 
 const routes = [
   { path: "/", redirect: "/login" },
@@ -34,6 +36,8 @@ const routes = [
       { path: "/rekap-absensi", component: RekapAbsensi },
       { path: "/log-presensi", component: LogPresensi },
       { path: "/data-gudang", component: Gudang },
+      { path: "/resep", component: Resep},
+      { path: "/distribusi-porsi", component: DistribusiPorsi},
       { path: "/laporan-stok", component: LaporanStok },
       { path: "/riwayat-absensi", component: RiwayatAbsensi },
 

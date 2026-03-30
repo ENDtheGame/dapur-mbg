@@ -66,6 +66,8 @@ import {
   LogOut,
   DownloadIcon,
   FileSliders,
+  UtensilsCrossed,
+  ClipboardPen,
 } from "lucide-vue-next";
 import logoUrl from "../assets/logo.png";
 
@@ -78,6 +80,9 @@ const menuItems = [
   { name: "Data Relawan", path: "/kelola-relawan", icon: Users },
   { name: "Jadwal kerja", path: "/jadwal-kerja", icon: Calendars },
   { name: "Manajemen Gudang", path: "/data-gudang", icon: ShelvingUnit },
+  { name: "Kalkulator porsi", path: "/resep", icon: 
+    UtensilsCrossed },
+  { name: "Distribusi Porsi", path: "/distribusi-porsi", icon: ClipboardPen },
   { name: "Laporan Stok", path: "/laporan-stok", icon: FileSliders },
   { name: "Riwayat Absensi", path: "/riwayat-absensi", icon: DownloadIcon },
   { name: "Rekap Absensi", path: "/rekap-absensi", icon: DownloadIcon },
